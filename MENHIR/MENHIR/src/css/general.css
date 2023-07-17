@@ -1,0 +1,284 @@
+:root {
+    --color-logo: #6098A9;
+    --color-connect: #EA5F86;
+    --color-beactive: #0C98BA;
+    --color-keeplearning: #96BB5F;
+    --color-give: #4D74A3;
+    --color-takenotice: #EE701E;
+    --color-h1: #00999F;
+
+    --mood-disconnected: 🙄;
+    --mood-anxious: 😰;
+    --mood-scared: 😨;
+    --mood-bored: 😒;
+    --mood-angry: 😡;
+    --mood-sad: 😢;
+    --mood-confident: 😌;
+    --mood-energetic: 😆;
+    --mood-useful: 🧐;
+    --mood-optimistic: 😉;
+    --mood-health: 😷;
+    --mood-loved: 🥰;
+    --mood-happy: 😊;
+}
+
+* {
+    box-sizing: border-box;
+    outline: none;
+    font-family: Roboto, 'Droid Sans', Helvetica, sans-serif;
+}
+
+html {
+    margin: 0;
+    height: 100%;
+    font-size: 16px;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    height: 100%;
+
+    & > main {
+        margin-top: 50px;
+        flex-grow: 1;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: none;
+        padding-left: 10px;
+        padding-right: 10px;
+        transition: opacity 0.5s;
+    }
+}
+
+.center-vh {
+    display: flex; 
+    width: 100%; 
+    height: 100%; 
+    flex-direction: column; 
+    justify-content: center; 
+    padding-bottom: 50px;
+}
+
+.simple-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.input-textbox {
+    display: block;
+    height: 45px;
+    min-height: 45px;
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 3px #ddd;
+    border-radius: 4px;
+    user-select: initial;
+}
+
+.input-select {
+    height: 45px;
+    min-height: 45px;
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 3px #ddd;
+    border-radius: 4px;
+    user-select: initial;
+    -webkit-appearance:none;
+    appearance: none;
+    background-color: transparent;
+
+    & option {
+        height: 45px;
+        min-height: 45px;
+        text-align: center;
+    }
+}
+
+.btn-default {
+    display: block;
+    height: 45px;
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 12px;
+    border: 1px solid #8a8383;
+    border-radius: 4px;
+    text-align: center;
+    user-select: none;
+}
+
+.btn-default:active {
+    background-color: var(--color-logo);
+}
+
+.selection {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+
+    & input {
+        display: none;
+    }
+    & input:checked + label {
+        background-color: var(--color-logo);
+    }
+    & label {
+        transition: background-color 0.3s;
+        width: 80%;
+    }
+}
+
+.form-selection {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    & h1 {
+        text-align: center;
+        font-size: 26px;
+    }
+
+    & input {
+        display: none;
+    }
+
+    & input:checked + label {
+        background-color: var(--color-logo);
+    }
+
+    & label {
+        transition: background-color 0.3s;
+    }
+}
+
+form[name="hobbies"] {
+    
+    & h1 {
+        color: #ccc;
+    }
+
+    & div {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        padding-left: 5px;
+        height: 35px;
+    }
+
+    & input {
+        margin-right: 10px;
+    }
+}
+
+form[name="HowAreYou"] {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    & h1 {
+        text-align: center;
+        font-size: 26px;
+    }
+
+    & .moods-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    & input {
+        display: none;
+    }
+
+    & input:checked + label {
+        background-color: var(--color-logo);
+    }
+
+    & label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 5px;
+        border-radius: 5px;
+        width: 100%;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        transition: background-color 0.3s;
+    }
+
+    & label span:first-child {
+        font-size: 50px;
+    }
+
+    & label span:nth-child(2) {
+        font-size: 20px;
+    }
+
+}
+
+form[name="NoteFeelings"] {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: 10px;
+
+    & textarea {
+        margin-top: 5px;
+        flex-grow: 1;
+        resize: vertical;
+        border-radius: 5px;
+        padding: 10px;
+    }
+}
+
+warning-msg {
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 5vw;
+    width: 90vw;
+    border-radius: 7px;
+    background-color: rgb(241, 203, 97);
+    padding: 10px;
+    z-index: 100;
+}
+
+error-msg {
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 5vw;
+    width: 90vw;
+    border-radius: 7px;
+    background-color: rgb(241, 97, 97);
+    padding: 10px;
+    z-index: 100;
+}
+
+info-msg {
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 5vw;
+    width: 90vw;
+    border-radius: 7px;
+    background-color: rgb(121, 241, 97);
+    padding: 10px;
+    z-index: 100;
+}

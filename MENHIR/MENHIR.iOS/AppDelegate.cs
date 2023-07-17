@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Foundation;
+using Plugin.DeviceOrientation;
 using UIKit;
 
 namespace MENHIR.iOS
@@ -26,6 +27,11 @@ namespace MENHIR.iOS
             LoadApplication(new App());
 
             return base.FinishedLaunching(app, options);
+        }
+
+        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, UIWindow forWindow)
+        {
+            return DeviceOrientationImplementation.SupportedInterfaceOrientations;
         }
     }
 }

@@ -1,0 +1,21 @@
+<style>
+    input {
+        display: none;
+    }
+    input:checked + label {
+        background-color: var(--color-logo);
+    }
+    label {
+        transition: background-color 0.3s;
+    }
+</style>
+<form class="prevent-select" style="height: 100%;">
+    <h1>Would you like to make a new entry?</h1>
+    
+    <input id="note" type="radio" value="yes" name="Iwant">
+    <label for="note" class="btn-default">Yes</label>
+
+    <input id="record" type="radio" value="no" name="Iwant">
+    <label for="record" class="btn-default">No</label>
+    
+</form>

@@ -1,31 +1,77 @@
-﻿using System;
+﻿using MENHIR.Utils;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Xam;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using static Xam.Plugins.SQLite.SQLite3;
 
 namespace MENHIR.Controls
 {
     public class HybridWebView : WebView
     {
-        private Dictionary<string, object> Instances = new Dictionary<string, object>();
+        private Dictionary<string, object> Instances { get; }
+        private Type TaskType { get; }
 
-        public void AddInstance(string key, object value)
+        private bool IsAndroid { get; }
+
+        public HybridWebView() 
         {
-            this.Instances.Add(key, value);
+            this.IsAndroid = DeviceInfo.Platform == DevicePlatform.Android;
+            this.Instances = new Dictionary<string, object>();
+            this.TaskType = typeof(Task);
         }
 
-        public void Cleanup()
+        public string Cleanup()
         {
+            foreach (var item in Instances)
+                try
+                {
+                    ((IDisposable)item.Value).Dispose();
+                }
+                catch (Exception)
+                {
+                }
+            
             this.Instances.Clear();
+            return "Instances cleared";
+        }
+
+        public string CleanInstance(string uid)
+        {
+            object instance = this.Instances[uid];
+
+            try
+            {
+                ((IDisposable)instance).Dispose();
+            }
+            catch (Exception)
+            {
+            }
+
+            this.Instances.Remove(uid);
+            return "Intance of [" + instance.GetType().Name + "] cleared";
         }
 
         public async void InvokeAction(string parameters)
+        {
+            if (MainThread.IsMainThread)
+                await DoAction(parameters);
+            else
+                MainThread.BeginInvokeOnMainThread(async () => await DoAction(parameters));
+        }
+
+        private async Task DoAction(string parameters)
         {
             bool error = false;
             object data = null;
@@ -35,35 +81,150 @@ namespace MENHIR.Controls
             {
                 Entity entity = JsonSerializer.Deserialize<Entity>(parameters);
                 ID = entity.ID;
-                object instance = this.Instances[entity.Name];
 
-                Type type = instance.GetType();
+                for (int i = 0; i < entity.Parameters.Length; i++)
+                    entity.Parameters[i] = entity.Parameters[i] == null? null : JsonElementToValue((JsonElement)entity.Parameters[i]);
 
-                object[] parametros = new object[entity.Parameters.Length];
+                //Se quiere crear una instancia de Classe nativa C#
+                if (entity.UID == "-CI-")
+                    data = ExecuteConstructor(entity);
 
-                for (int i = 0; i < parametros.Length; i++)
-                    parametros[i] = JsonElementToValue((JsonElement)entity.Parameters[i]);
-                
-                object resultTask = type.InvokeMember(entity.MethodName, BindingFlags.InvokeMethod, null, instance, parametros);
-                await (Task)resultTask;
-                var result = resultTask.GetType().GetProperty("Result").GetValue(resultTask, null);
-                data = result;
+                else if (entity.UID == "-CU-")
+                    if (string.IsNullOrWhiteSpace(entity.Method))
+                        data = Cleanup();
+                    else
+                        data = CleanInstance(entity.Method);
+
+                else if (entity.UID == "-RE-")
+                    this.Reload();
+
+                else if (entity.UID == "-CLOSE-")
+                    System.Diagnostics.Process.GetCurrentProcess().Kill();
+
+                else if (entity.UID == "-RTF-")
+                    data = File.ReadAllText(entity.Method);
+
+                else if (entity.UID == "-RF64-")
+                    data = Convert.ToBase64String(File.ReadAllBytes(entity.Method));
+
+                else
+                {
+                    object instance = this.Instances[entity.UID];
+                    Type type = instance.GetType();
+
+                    BindingFlags flag;
+                    object resultRaw;
+
+                    //Getter
+                    if (entity.IsGetSet && entity.Parameters.Length == 0)
+                        flag = BindingFlags.GetProperty;
+
+                    //Setter
+                    else if (entity.IsGetSet && entity.Parameters.Length > 0)
+                        flag = BindingFlags.SetProperty;
+
+                    //Method
+                    else
+                        flag = BindingFlags.InvokeMethod;
+
+                    resultRaw = type.InvokeMember(entity.Method, flag, null, instance, entity.Parameters);
+
+                    if (resultRaw == null)
+                        data = null;
+                    else
+                    {
+                        Type resultType = resultRaw.GetType();
+
+                        if (this.TaskType.IsAssignableFrom(resultType))
+                        {
+                            await (Task)resultRaw;
+                            var result = resultRaw.GetType().GetProperty("Result");
+                            if (result != null)
+                                data = result.GetValue(resultRaw, null);
+                            else
+                                data = null;
+                        }
+                        else
+                            data = resultRaw;
+                    }
+                }
+            }
+            
+            catch (XamException ex)
+            {
+                data = "";
+                data += "type: " + ex.Type + Environment.NewLine;
+                data += "message: " + ex.Message + Environment.NewLine;
+                data += ex.StackTrace + Environment.NewLine;
+                error = true;
             }
             catch (Exception ex)
             {
-                data = ex.Message;
+                data = "";
+                data += "message: " + ex.Message + Environment.NewLine;
+                data += "parameters: " + parameters + Environment.NewLine;
+                data += ex.StackTrace + Environment.NewLine;
                 error = true;
             }
 
-            if (MainThread.IsMainThread)
-                await ExecuteJS(ID, error, data);
-            else
-                MainThread.BeginInvokeOnMainThread(async () => { await ExecuteJS(ID, error, data); });
+            await ExecuteJS(ID, error, data);
+        }
+
+        private string ExecuteConstructor(Entity entity)
+        {
+            string TypeName = entity.Method;
+
+            if (!MainPage.Types.ContainsKey(TypeName))
+                throw new XamException("Plugin \"" + TypeName + "\" not exists", "Plugin constructor");
+
+            var type = MainPage.Types[TypeName];
+
+            var UID = Guid.NewGuid().ToString();
+            var instance = Activator.CreateInstance(type, entity.Parameters);
+            this.Instances[UID] = instance;
+            return UID;
         }
 
         private async Task ExecuteJS(string ID, bool error, object data)
         {
-            await this.EvaluateJavaScriptAsync($"window['-_-'].Post('{ID}', {error.ToString().ToLower()}, {JsonSerializer.Serialize(data)})");
+            string result;
+
+            try
+            {
+                result = FormatResult(data);
+            }
+            catch (Exception ex)
+            {
+                error = true;
+                result = FormatResultError(data, ex);
+            }
+
+            string js = $"window['-{MainPage.UID}-'].Post('{ID}', {error.ToString().ToLower()}, {result})";
+
+            await this.EvaluateJavaScriptAsync(js);
+        }
+
+        public async Task ExecuteJSEvent(string name, object data) 
+        {
+            string result = string.Empty;
+            bool error = false;
+
+            try
+            {
+                result = FormatResult(data);
+            }
+            catch (Exception ex)
+            {
+                error = true;
+                result = FormatResultError(data, ex);
+            }
+
+            string js = $"window['-{MainPage.UID}-'].FireEvent('{name}', {error.ToString().ToLower()}, {result})";
+
+            if (MainThread.IsMainThread)
+                await this.EvaluateJavaScriptAsync(js);
+            else
+                MainThread.BeginInvokeOnMainThread(async () => await this.EvaluateJavaScriptAsync(js));
         }
 
         private object JsonElementToValue(JsonElement item)
@@ -77,7 +238,12 @@ namespace MENHIR.Controls
                 case JsonValueKind.Number:
 
                     if (Math.Abs(item.GetDouble() % 1) <= (Double.Epsilon * 100))
-                        return item.GetInt32();
+                    {
+                        if (item.TryGetInt32(out var value))
+                            return value;
+
+                        return item.GetInt64();
+                    }
 
                     return item.GetDouble();
 
@@ -95,11 +261,19 @@ namespace MENHIR.Controls
                     return temp;
 
                 case JsonValueKind.Object:
-                    var temp3 = JsonSerializer.Deserialize<Dictionary<string, object>>(item.GetString());
+                    var temp3 = JsonSerializer.Deserialize<Dictionary<string, object>>(item.GetRawText());
                     var temp4 = new Dictionary<string, object>();
 
                     foreach (var item1 in temp3)
+                    {
+                        if(item1.Value is null)
+                        {
+                            temp4[item1.Key] = null;
+                            continue;
+                        }
+
                         temp4[item1.Key] = JsonElementToValue((JsonElement)item1.Value);
+                    }
                     
                     return temp4;
 
@@ -108,6 +282,53 @@ namespace MENHIR.Controls
             }
         }
 
+        private string FormatResult(object data)
+        {
+            string result;
+
+            // Es iOS, se requiere hacer un formateo previo para tratar con letras del tipo "\n"
+            if (!this.IsAndroid)
+            {
+                bool rawHasSlash = false;
+
+                //El texto original NO formateado, contiene al menos un slash "\", se reemplaza por unos caracteres raros
+                if (data != null && data.GetType() == typeof(string) && data.ToString().Contains(@"\"))
+                {
+                    data = data.ToString().Replace(@"\", "@$~|");
+                    rawHasSlash = true;
+                }
+
+
+                result = JsonSerializer.Serialize(data);
+                if (result.Contains(@"\"))
+                    result = result.Replace(@"\", @"\\");
+
+                if (rawHasSlash)
+                    result = result.Replace("@$~|", @"\\\");
+            }
+            else
+                result = JsonSerializer.Serialize(data);
+
+            return result;
+        }
+    
+        private string FormatResultError(object data, Exception ex)
+        {
+            string result;
+
+            result = "message: JsonSerializer fail - " + ex.Message + Environment.NewLine + "raw-data: ";
+
+            try
+            {
+                result += data.ToString();
+            }
+            catch (Exception)
+            {
+                result += data + "";
+            }
+
+            return result + Environment.NewLine;
+        }
     }
 
     internal class Entity
@@ -118,18 +339,24 @@ namespace MENHIR.Controls
         public string ID { get; set; }
 
         /// <summary>
-        /// Nombre de la instancia del objeto
+        /// Identificador unico de instancia de objeto nativo
         /// </summary>
-        public string Name { get; set; }
+        public string UID { get; set; }
 
         /// <summary>
-        /// Nombre del metodo a invocar
+        /// Nombre del metodo/constructor a invocar
         /// </summary>
-        public string MethodName { get; set; }
+        public string Method { get; set; }
 
         /// <summary>
-        /// Parametros de la forma ["tipo1", valor1, "tipo2", valor2, ...]
+        /// Parametros de la forma [valor1, valor2, ...]
         /// </summary>
         public object[] Parameters { get; set; }
+
+        /// <summary>
+        /// Indica si es un getter o setter
+        /// </summary>
+        public bool IsGetSet { get; set; }
     }
+
 }

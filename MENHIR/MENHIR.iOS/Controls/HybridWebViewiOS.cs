@@ -15,29 +15,6 @@ namespace MENHIR.iOS.Controls
 {
     public class HybridWebViewiOS : WkWebViewRenderer, IWKScriptMessageHandler
     {
-        private const string JavaScriptFunction = @"
-            window['-_-'] = {
-                ID: 0,
-                Handlers: {},
-                Send: function(name, methodName, parameters){
-                    return new Promise((resolve, reject) => {
-                        const handle = 'm' + this.ID++;
-                        this.Handlers[handle] = { resolve, reject };
-                        const data = JSON.stringify({ID: handle, Name: name, MethodName: methodName, Parameters: parameters });
-                        window.webkit.messageHandlers.invokeAction.postMessage(data);
-                    });
-                },
-                Post: function(ID, error, data){
-                    if(error)
-                        this.Handlers[ID].reject(data);
-                    else
-                        this.Handlers[ID].resolve(data);
-
-                    delete this.Handlers[ID];
-                }
-            }
-            /* function invokeXamarinFormsAction(data){window.webkit.messageHandlers.invokeAction.postMessage(data);} */
-        ";
         private WKUserContentController _userController;
 
         public HybridWebViewiOS() : this(new WKWebViewConfiguration())
@@ -47,7 +24,9 @@ namespace MENHIR.iOS.Controls
         public HybridWebViewiOS(WKWebViewConfiguration config) : base(config)
         {
             _userController = config.UserContentController;
-            var script = new WKUserScript(new NSString(JavaScriptFunction), WKUserScriptInjectionTime.AtDocumentEnd, false);
+            string Script = MainPage.Script.Replace("/*Bridge*/", "window.webkit.messageHandlers.invokeAction.postMessage(data);");
+            var script = new WKUserScript(new NSString(Script), WKUserScriptInjectionTime.AtDocumentStart, false);
+            //var script = new WKUserScript(new NSString(Script), WKUserScriptInjectionTime.AtDocumentEnd, false);
             _userController.AddUserScript(script);
             _userController.AddScriptMessageHandler(this, "invokeAction");
 
@@ -80,7 +59,7 @@ namespace MENHIR.iOS.Controls
                 _userController.RemoveAllUserScripts();
                 _userController.RemoveScriptMessageHandler("invokeAction");
                 HybridWebView hybridWebViewMain = e.OldElement as HybridWebView;
-                hybridWebViewMain?.Cleanup();
+                //hybridWebViewMain?.Cleanup();
             }
 
             if (e.NewElement != null)

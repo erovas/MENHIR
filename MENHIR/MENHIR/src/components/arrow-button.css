@@ -1,0 +1,43 @@
+arrow-button {
+    display: flex;
+    min-height: 50px;
+    max-height: 50px;
+    min-width: 50px;
+    max-width: 50px;
+    background-color: rgb(236, 236, 236);
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+
+    & arrow-icon {
+        display: inline-block;
+        border: solid black;
+        border-width: 0 3px 3px 0;
+        padding: 5px;
+        transform: rotate(135deg) translate(-2px, -2px);
+    }
+
+    &[data-direction = "up"] arrow-icon {
+        transform: rotate(-135deg) translate(-2px, -2px);
+    }
+
+    &[data-direction = "right"] arrow-icon {
+        transform: rotate(-45deg) translate(-2px, -2px);
+    }
+
+    &[data-direction = "down"] arrow-icon {
+        transform: rotate(45deg) translate(-2px, -2px);
+    }
+}
+
+arrow-button.hide {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear 300ms, opacity 200ms;
+}
+
+arrow-button.show {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s linear 0s, opacity 200ms;
+}

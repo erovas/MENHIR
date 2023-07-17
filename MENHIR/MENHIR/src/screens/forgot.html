@@ -1,0 +1,40 @@
+<style>
+    .hide-result {
+        display: none;
+    }
+
+    .show-result {
+        display: flex;
+    }
+</style>
+
+<form name="SignIn" class="ctn-default" style="justify-content: flex-start;">
+
+    <h1 style="text-align: center; font-size: 42px;">
+        Recover your password
+    </h1>
+
+    <input
+        class="input-textbox"
+        id="Username"
+        type="text"
+        placeholder="Write your username"
+    />
+    <input
+        class="input-textbox"
+        id="Phrase"
+        type="text"
+        placeholder="Write your phrase"
+    />
+    
+    <div style="height: 25px;"></div>
+    <div class="btn-default" id="Validate">Validate</div>
+    <div style="height: 25px;"></div>
+
+    <div id="Result" class="hide-result" style="justify-content: center; flex-direction: column; align-items: center;">
+        <h3 style="margin: 0;">Your password is:</h3>
+        <h2 id="Password">QWERTY</h2>
+    </div>
+    
+
+</form>

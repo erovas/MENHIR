@@ -229,7 +229,7 @@ namespace MENHIR.Utils
     public class Trace
     {
         /// <summary>
-        /// Name of the method that generated the trace
+        /// UID of the method that generated the trace
         /// </summary>
         public string Method { get; }
 

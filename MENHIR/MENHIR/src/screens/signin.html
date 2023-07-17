@@ -1,0 +1,83 @@
+<style>
+    
+    form[name="SignIn"] {
+
+        & .Forgot {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            color: #216fdb;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        & .separator {
+            display: block;
+            overflow: hidden;
+            text-align: center;
+            white-space: nowrap;
+
+            margin-top: 10px;
+            margin-bottom: 10px;
+
+            & span {
+                display: inline-block;
+                position: relative;
+                color: #4b4f56;
+                user-select: none;
+
+                &::before,
+                &::after {
+                    background: #ccd0d5;
+                    content: '';
+                    height: 1px;
+                    position: absolute;
+                    top: 50%;
+                    width: 9999px;
+                }
+
+                &::before {
+                    margin-right: 15px;
+                    right: 100%;
+                }
+
+                &::after {
+                    left: 100%;
+                    margin-left: 15px;
+                }
+            }
+        }
+    }
+    
+</style>
+
+<form name="SignIn" class="ctn-default">
+    <h1 style="text-align: center; font-size: 42px;">
+        The Mood App
+    </h1>
+
+    <input
+        class="input-textbox"
+        id="Username"
+        type="text"
+        placeholder="Username"
+    />
+    <input
+        class="input-textbox"
+        id="Password"
+        type="password"
+        placeholder="Password"
+    />
+    <div class="btn-default" id="SingIn">Sign In</div>
+
+    <a class="Forgot" id="Forgot"> Forgot your password? </a>
+
+    <div class="separator">
+    <span>or</span>
+    </div>
+
+    <div class="btn-default" id="Register">Register</div>
+    <div class="gap"></div>
+    <div class="gap"></div>
+
+</form>

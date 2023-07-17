@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 /*
@@ -7,80 +8,40 @@ using System.Threading.Tasks;
 */
 namespace Xam.Plugins.SQLite
 {
-    public class SQLiteAsyncConnection
+    public class SQLiteConnectionAsync : IDisposable
     {
         private SQLiteConnection Connection { get; set; }
 
         #region PUBLIC PROPERTIES
 
-        public Task<bool> GetDisposed()
+        public bool Disposed { get; private set; }
+
+        public bool IsOpen => this.Connection.IsOpen;
+
+        public bool IsTransaction => this.Connection.IsTransaction;
+
+        public string DatabasePath
         {
-            return Task.Factory.StartNew(delegate
-            { 
-                return Connection.Disposed; 
-            });
+            get => this.Connection.DatabasePath;
+            set => this.Connection.DatabasePath = value;
         }
 
-        public Task<bool> GetIsOpen()
+        public int Timeout
         {
-            return Task.Factory.StartNew(delegate
-            {
-                return Connection.IsOpen;
-            });
-        }
-
-        public Task<bool> GetIsTransaction()
-        {
-            return Task.Factory.StartNew(delegate
-            {
-                return Connection.IsTransaction;
-            });
-        }
-
-        public Task<string> GetDatabasePath()
-        {
-            return Task.Factory.StartNew(delegate
-            {
-                return Connection.DatabasePath;
-            });
-        }
-
-        public Task SetDatabasePath(string value)
-        {
-            return Task.Factory.StartNew(delegate
-            {
-                Connection.DatabasePath = value;
-                return;
-            });
-        }
-
-        public Task<int> GetTimeout()
-        {
-            return Task.Factory.StartNew(delegate
-            {
-                return Connection.Timeout;
-            });
-        }
-
-        public Task SetTimeout(int value)
-        {
-            return Task.Factory.StartNew(delegate
-            {
-                Connection.Timeout = value;
-                return;
-            });
+            get => this.Connection.Timeout;
+            set => this.Connection.Timeout = value;
         }
 
         #endregion
 
         #region CONSTRUCTORS
 
-        public SQLiteAsyncConnection() 
+        public SQLiteConnectionAsync() 
         {
             this.Connection = new SQLiteConnection();
         }
 
-        public SQLiteAsyncConnection(string databasePath) : this() 
+        public SQLiteConnectionAsync(string databasePath) : this() 
         {
             this.Connection.DatabasePath = databasePath;
         }
@@ -247,13 +208,9 @@ namespace Xam.Plugins.SQLite
 
         #region DISPOSE
 
-        public Task Dispose()
+        public void Dispose()
         {
-            return Task.Factory.StartNew(delegate
-            {
-                this.Connection.Dispose();
-                return;
-            });
+            this.Connection.Dispose();
         }
 
         #endregion

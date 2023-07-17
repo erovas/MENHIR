@@ -12,6 +12,7 @@ namespace Xam.Plugins.SQLite
     public class SQLiteConnection : IDisposable
     {
         private const string PREFIX = "@";
+        private const string TYPE_ERROR = "DBError";
 
         static SQLiteConnection()
         {
@@ -99,13 +100,13 @@ namespace Xam.Plugins.SQLite
             AUX_ThrowDisposedException();
 
             if (this.IsOpen)
-                throw new Exception("Connection is already open");
+                throw CreateException("Connection is already open");
 
             SQLite3.Result result = SQLite3.Open(this.DatabasePath, out sqlite3 db, (int)(0x2 | 0x4), null);
             this.Handle = db;
 
             if (result != 0)
-                throw new SQLiteException(result, $"Could not open database file: {this.DatabasePath} ({result})");
+                throw CreateException($"Could not open database file: {this.DatabasePath} ({result})");
 
             SQLite3.BusyTimeout(this.Handle, this.Timeout);
             this.IsOpen = true;
@@ -127,7 +128,7 @@ namespace Xam.Plugins.SQLite
             AUX_ThrowIsNotOpen();
 
             if (this.IsTransaction)
-                throw new Exception("Transaction has already been started");
+                throw CreateException("Transaction has already been started");
 
             ExecuteNonQuery("begin transaction");
             this.IsTransaction = true;
@@ -292,7 +293,7 @@ namespace Xam.Plugins.SQLite
                     if (result != 0)
                     {
                         string errmsg = SQLite3.GetErrmsg(Handle);
-                        throw new SQLiteException(result, errmsg);
+                        throw CreateException(errmsg);
                     }
                 }
                 else if (flag)
@@ -339,16 +340,16 @@ namespace Xam.Plugins.SQLite
 
                     case SQLite3.Result.Error:
                         string errmsg = SQLite3.GetErrmsg(connection);
-                        throw new SQLiteException(result, errmsg);
+                        throw CreateException(errmsg);
                         
                     case SQLite3.Result.Constraint:
                         if (SQLite3.ExtendedErrCode(connection) == SQLite3.ExtendedResult.ConstraintNotNull)
-                            throw new NotNullConstraintViolationException(result, SQLite3.GetErrmsg(connection));
+                            throw CreateException(SQLite3.GetErrmsg(connection));
 
                         break;
                 }
 
-                throw new SQLiteException(result, SQLite3.GetErrmsg(connection));
+                throw CreateException(SQLite3.GetErrmsg(connection));
             }
             finally
             {
@@ -371,16 +372,16 @@ namespace Xam.Plugins.SQLite
                         return null;
 
                     case SQLite3.Result.Error:
-                        throw new SQLiteException(result, SQLite3.GetErrmsg(connection));
+                        throw CreateException(SQLite3.GetErrmsg(connection));
 
                     case SQLite3.Result.Constraint:
                         if (SQLite3.ExtendedErrCode(connection) == SQLite3.ExtendedResult.ConstraintNotNull)
-                            throw new NotNullConstraintViolationException(result, SQLite3.GetErrmsg(connection));
+                            throw CreateException(SQLite3.GetErrmsg(connection));
 
                         break;
                 }
 
-                throw new SQLiteException(result, SQLite3.GetErrmsg(connection));
+                throw CreateException(SQLite3.GetErrmsg(connection));
             }
             finally
             {
@@ -422,19 +423,19 @@ namespace Xam.Plugins.SQLite
                         return resultFinal;
                         
                     case SQLite3.Result.Done:
-                        return null;
+                        return new IReadOnlyDictionary<string, object>[0];
 
                     case SQLite3.Result.Error:
-                        throw new SQLiteException(result, SQLite3.GetErrmsg(connection));
+                        throw CreateException(SQLite3.GetErrmsg(connection));
 
                     case SQLite3.Result.Constraint:
                         if (SQLite3.ExtendedErrCode(connection) == SQLite3.ExtendedResult.ConstraintNotNull)
-                            throw new NotNullConstraintViolationException(result, SQLite3.GetErrmsg(connection));
+                            throw CreateException(SQLite3.GetErrmsg(connection));
 
                         break;
                 }
 
-                throw new SQLiteException(result, SQLite3.GetErrmsg(connection));
+                throw CreateException(SQLite3.GetErrmsg(connection));
             }
             finally
             {
@@ -472,16 +473,16 @@ namespace Xam.Plugins.SQLite
                         break;
 
                     case SQLite3.Result.Error:
-                        throw new SQLiteException(result, SQLite3.GetErrmsg(connection));
+                        throw CreateException(SQLite3.GetErrmsg(connection));
 
                     case SQLite3.Result.Constraint:
                         if (SQLite3.ExtendedErrCode(connection) == SQLite3.ExtendedResult.ConstraintNotNull)
-                            throw new NotNullConstraintViolationException(result, SQLite3.GetErrmsg(connection));
+                            throw CreateException(SQLite3.GetErrmsg(connection));
 
                         break;
 
                     default:
-                        throw new SQLiteException(result, SQLite3.GetErrmsg(connection));
+                        throw CreateException(SQLite3.GetErrmsg(connection));
                 }
             }
             finally
@@ -493,7 +494,7 @@ namespace Xam.Plugins.SQLite
         private void AUX_ThrowDisposedException()
         {
             if (this.Disposed)
-                throw new ObjectDisposedException(this.GetType().Name);
+                throw CreateException(this.GetType().Name);
         }
 
         private void AUX_ThrowIsNotOpen()
@@ -501,7 +502,7 @@ namespace Xam.Plugins.SQLite
             if (this.IsOpen)
                 return;
 
-            throw new Exception("Connection is no open");
+            throw CreateException("Connection is no open");
         }
 
         private void AUX_ThrowIsNotTransaction()
@@ -509,7 +510,7 @@ namespace Xam.Plugins.SQLite
             if (this.IsTransaction)
                 return;
 
-            throw new Exception("Transaction not started");
+            throw CreateException("Transaction not started");
         }
 
         private static void AUX_SetParameters(sqlite3_stmt statement, Dictionary<string, object> parameters)
@@ -628,7 +629,7 @@ namespace Xam.Plugins.SQLite
                 return;
             }
 
-            throw new NotSupportedException("Cannot store type: " + value.GetType().FullName);
+            throw CreateException("Cannot store type: " + value.GetType().FullName);
         }
 
         private static object AUX_GetColumnValue(sqlite3_stmt statement, int index)
@@ -639,7 +640,8 @@ namespace Xam.Plugins.SQLite
             switch (columnType)
             {
                 case SQLite3.ColType.Integer:
-                    value = SQLite3.ColumnInt(statement, index);
+                    //value = SQLite3.ColumnInt(statement, index);
+                    value = SQLite3.ColumnInt64(statement, index);
                     break;
                 case SQLite3.ColType.Float:
                     value = SQLite3.ColumnDouble(statement, index);
@@ -656,6 +658,11 @@ namespace Xam.Plugins.SQLite
             }
 
             return value;
+        }
+
+        private static XamException CreateException(string msg)
+        {
+            return new XamException(msg, TYPE_ERROR);
         }
 
         #endregion

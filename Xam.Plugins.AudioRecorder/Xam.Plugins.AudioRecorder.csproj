@@ -8,4 +8,8 @@
     <PackageReference Include="Plugin.AudioRecorder" Version="1.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Xam\Xam.csproj" />
+  </ItemGroup>
+
 </Project>

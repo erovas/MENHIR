@@ -1,0 +1,256 @@
+:root {
+    --color-logo: #6098A9;
+    --color-connect: #EA5F86;
+    --color-beactive: #0C98BA;
+    --color-keeplearning: #96BB5F;
+    --color-give: #4D74A3;
+    --color-takenotice: #EE701E;
+    --color-h1: #00999F;
+    --banner-height: 50px;
+
+    --mood-disconnected: 🙄;
+    --mood-anxious: 😰;
+    --mood-scared: 😨;
+    --mood-bored: 😒;
+    --mood-angry: 😡;
+    --mood-sad: 😢;
+    --mood-confident: 😌;
+    --mood-energetic: 😆;
+    --mood-useful: 🧐;
+    --mood-optimistic: 😉;
+    --mood-health: 😷;
+    --mood-loved: 🥰;
+    --mood-happy: 😊;
+}
+
+* {
+    box-sizing: border-box;
+    outline: none;
+    font-family: Roboto, 'Droid Sans', Helvetica, sans-serif;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-size: 16px;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.banner {
+    display: flex;
+    min-height: var(--banner-height);
+    max-height: var(--banner-height);
+    height: var(--banner-height);
+    min-width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    justify-content:end;
+    align-items: center;
+    background-color: white;
+    z-index: 10;
+
+    & img {
+        height: 100%;
+    }
+}
+
+.input-textbox {
+    display: block;
+    height: var(--banner-height);
+    min-height: var(--banner-height);
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 3px #ddd;
+    border-radius: 4px;
+    user-select: initial;
+    width: 100%;
+}
+
+.input-select {
+    height: var(--banner-height);
+    min-height: var(--banner-height);
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 3px #ddd;
+    border-radius: 4px;
+    user-select: initial;
+    appearance: none;
+    background-color: transparent;
+    width: 100%;
+    text-align: center; /* Android */
+    text-align-last: center; /* iOS, Android */
+
+    & option {
+        height: var(--banner-height);
+        min-height: var(--banner-height);
+    }
+}
+
+.btn-default {
+    display: block;
+    height: var(--banner-height);
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 12px;
+    border: 1px solid #8a8383;
+    border-radius: 4px;
+    text-align: center;
+    user-select: none;
+}
+
+.btn-default:active {
+    background-color: var(--color-logo);
+}
+
+.ctn-default {
+    display: flex; 
+    width: 100%; 
+    height: 100%; 
+    flex-direction: column; 
+    justify-content: center;
+}
+
+.gap {
+    height: var(--banner-height);
+    min-height: var(--banner-height);
+    max-height: var(--banner-height);
+    display: block;
+    width: 100vw;
+}
+
+.select-mood {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    & h1 {
+        text-align: center;
+        font-size: 26px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    & .moods-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    & input {
+        display: none;
+    }
+
+    & input:checked + label {
+        background-color: var(--color-logo);
+    }
+
+    & label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 5px;
+        border-radius: 5px;
+        /*width: 100%;*/
+        padding-top: 5px;
+        padding-bottom: 5px;
+        transition: background-color 0.3s;
+        flex-basis: 33.333333%;
+    }
+
+    & label span:first-child {
+        font-size: 50px;
+    }
+
+    & label span:nth-child(2) {
+        font-size: 16px;
+    }
+}
+
+simple-slider {
+    flex-grow: 1;
+
+    & simple-slide.hide {
+        pointer-events: none;
+        opacity: 0.3;
+        transition: opacity 200ms;
+    }
+    
+    & simple-slide.show {
+        pointer-events: initial;
+        opacity: 1;
+        transition: opacity 200ms, pointer-events 200ms;
+    }
+    
+    & simple-slide.delete * {
+        visibility: visible;
+        visibility: hidden;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 200ms, pointer-events 200ms;
+    }
+    
+    & simple-slide {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+form[name="hobbies"] {
+    
+    & h1 {
+        color: #ccc;
+    }
+
+    & div {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        padding-left: 5px;
+        height: 35px;
+    }
+
+    & input {
+        margin-right: 10px;
+    }
+}
+
+form[name="NoteFeelings"] {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: 10px;
+
+    & textarea {
+        margin-top: 5px;
+        flex-grow: 1;
+        resize: vertical;
+        border-radius: 5px;
+        padding: 10px;
+    }
+}

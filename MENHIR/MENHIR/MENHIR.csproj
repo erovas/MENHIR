@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -11,13 +11,234 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="src\AMHL.jpg" />
+    <None Remove="src\components\arrow-button.js" />
+    <None Remove="src\components\exit-alert.js" />
+    <None Remove="src\components\loading-screen.js" />
+    <None Remove="src\components\msg-box.js" />
+    <None Remove="src\components\player-sound.js" />
+    <None Remove="src\components\simple-slider.js" />
+    <None Remove="src\html\SC_00.html" />
+    <None Remove="src\html\SC_01.html" />
+    <None Remove="src\html\SC_01_1A.html" />
+    <None Remove="src\html\SC_01_2A.html" />
+    <None Remove="src\html\SC_01_3A.html" />
+    <None Remove="src\html\SC_01_4A.html" />
+    <None Remove="src\html\SC_01_5A.html" />
+    <None Remove="src\html\SC_01_6A.html" />
+    <None Remove="src\html\SC_02.html" />
+    <None Remove="src\html\SC_03.html" />
+    <None Remove="src\html\SC_04.html" />
+    <None Remove="src\html\SC_04A.html" />
+    <None Remove="src\html\SC_05.html" />
+    <None Remove="src\html\SC_05_1A.html" />
+    <None Remove="src\html\SC_05_1B.html" />
+    <None Remove="src\html\SC_05_2A.html" />
+    <None Remove="src\html\SC_06.html" />
+    <None Remove="src\html\SC_07.html" />
+    <None Remove="src\img\AMHL.jpg" />
+    <None Remove="src\img\MENHIR-logo-simple.png" />
+    <None Remove="src\img\MENHIR.png" />
+    <None Remove="src\img\UGR.png" />
+    <None Remove="src\img\UPV_EHU.jpg" />
+    <None Remove="src\index-backup.html" />
+    <None Remove="src\index-backup2.html" />
+    <None Remove="src\index.js" />
+    <None Remove="src\index2.js" />
+    <None Remove="src\index3.js" />
+    <None Remove="src\js\Back-Button.js" />
+    <None Remove="src\js\Classes.js" />
+    <None Remove="src\js\ConfigDataBase.js" />
+    <None Remove="src\js\Loading-Screen.js" />
+    <None Remove="src\js\Msgs.js" />
+    <None Remove="src\js\Next-Button.js" />
+    <None Remove="src\js\Routes.js" />
+    <None Remove="src\js\script.js" />
+    <None Remove="src\js\SC_00.js" />
+    <None Remove="src\js\SC_01.js" />
+    <None Remove="src\js\SC_01A.js" />
+    <None Remove="src\js\SC_01_1A.js" />
+    <None Remove="src\js\SC_01_2A.js" />
+    <None Remove="src\js\SC_01_3A.js" />
+    <None Remove="src\js\SC_01_4A.js" />
+    <None Remove="src\js\SC_01_5A.js" />
+    <None Remove="src\js\SC_01_6A.js" />
+    <None Remove="src\js\SC_01_XA.js" />
+    <None Remove="src\js\SC_02.js" />
+    <None Remove="src\js\SC_03.js" />
+    <None Remove="src\js\SC_04.js" />
+    <None Remove="src\js\SC_04A.js" />
+    <None Remove="src\js\SC_05.js" />
+    <None Remove="src\js\SC_05_1A.js" />
+    <None Remove="src\js\SC_05_1B.js" />
+    <None Remove="src\js\SC_05_2A.js" />
+    <None Remove="src\js\SC_06.js" />
+    <None Remove="src\js\SC_07.js" />
+    <None Remove="src\js\Simple-Slider.js" />
+    <None Remove="src\js\TypesDef.js" />
+    <None Remove="src\js\User.js" />
+    <None Remove="src\js\Utils.js" />
+    <None Remove="src\MENHIR.png" />
+    <None Remove="src\Routes.js" />
+    <None Remove="src\screens\404.html" />
+    <None Remove="src\screens\404.js" />
+    <None Remove="src\screens\action.html" />
+    <None Remove="src\screens\action.js" />
+    <None Remove="src\screens\another-action.html" />
+    <None Remove="src\screens\another-action.js" />
+    <None Remove="src\screens\crisis.html" />
+    <None Remove="src\screens\crisis.js" />
+    <None Remove="src\screens\final.html" />
+    <None Remove="src\screens\final.js" />
+    <None Remove="src\screens\forgot.html" />
+    <None Remove="src\screens\forgot.js" />
+    <None Remove="src\screens\good-job.html" />
+    <None Remove="src\screens\good-job.js" />
+    <None Remove="src\screens\mood-after.js" />
+    <None Remove="src\screens\mood-answer-after.js" />
+    <None Remove="src\screens\mood-answer-before.js" />
+    <None Remove="src\screens\mood-answer.html" />
+    <None Remove="src\screens\mood-answer.js" />
+    <None Remove="src\screens\mood-before.js" />
+    <None Remove="src\screens\mood.html" />
+    <None Remove="src\screens\mood.js" />
+    <None Remove="src\screens\notice.html" />
+    <None Remove="src\screens\notice.js" />
+    <None Remove="src\screens\record-audio.html" />
+    <None Remove="src\screens\record-audio.js" />
+    <None Remove="src\screens\register-beactive.js" />
+    <None Remove="src\screens\register-connect.js" />
+    <None Remove="src\screens\register-give.js" />
+    <None Remove="src\screens\register-keeplearning.js" />
+    <None Remove="src\screens\register-takenotice.js" />
+    <None Remove="src\screens\register-wellbeing.html" />
+    <None Remove="src\screens\register-wellbeing.js" />
+    <None Remove="src\screens\register.html" />
+    <None Remove="src\screens\register.js" />
+    <None Remove="src\screens\review.html" />
+    <None Remove="src\screens\review.js" />
+    <None Remove="src\screens\select-action.js" />
+    <None Remove="src\screens\selection.html" />
+    <None Remove="src\screens\signin.html" />
+    <None Remove="src\screens\signin.js" />
+    <None Remove="src\screens\suggestion.html" />
+    <None Remove="src\screens\suggestion.js" />
+    <None Remove="src\screens\welcome.html" />
+    <None Remove="src\screens\welcome.js" />
+    <None Remove="src\screens\write-feelings.html" />
+    <None Remove="src\screens\write-feelings.js" />
+    <None Remove="src\script.js" />
+    <None Remove="src\sql\01-CreateDataBase.sql" />
+    <None Remove="src\sql\02-PopulateDataBase.sql" />
+    <None Remove="src\swipe.js" />
+    <None Remove="src\Swipe2.js" />
+    <None Remove="src\UPV_EHU.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="src\components\arrow-button.js" />
+    <EmbeddedResource Include="src\components\exit-alert.js" />
+    <EmbeddedResource Include="src\components\loading-screen.js" />
+    <EmbeddedResource Include="src\components\msg-box.js" />
+    <EmbeddedResource Include="src\components\player-sound.js" />
+    <EmbeddedResource Include="src\components\simple-slider.js" />
+    <EmbeddedResource Include="src\img\AMHL.jpg" />
+    <EmbeddedResource Include="src\img\MENHIR-logo-simple.png" />
+    <EmbeddedResource Include="src\img\MENHIR.png" />
+    <EmbeddedResource Include="src\img\UGR.png" />
+    <EmbeddedResource Include="src\img\UPV_EHU.jpg" />
+    <EmbeddedResource Include="src\index.html" />
+    <EmbeddedResource Include="src\index.js" />
+    <EmbeddedResource Include="src\js\Classes.js" />
+    <EmbeddedResource Include="src\js\ConfigDataBase.js" />
+    <EmbeddedResource Include="src\js\Routes.js" />
+    <EmbeddedResource Include="src\js\TypesDef.js" />
+    <EmbeddedResource Include="src\js\Utils.js" />
+    <EmbeddedResource Include="src\Routes.js" />
+    <EmbeddedResource Include="src\screens\404.html" />
+    <EmbeddedResource Include="src\screens\404.js" />
+    <EmbeddedResource Include="src\screens\action.html" />
+    <EmbeddedResource Include="src\screens\action.js" />
+    <EmbeddedResource Include="src\screens\another-action.html" />
+    <EmbeddedResource Include="src\screens\another-action.js" />
+    <EmbeddedResource Include="src\screens\crisis.html" />
+    <EmbeddedResource Include="src\screens\crisis.js" />
+    <EmbeddedResource Include="src\screens\final.html" />
+    <EmbeddedResource Include="src\screens\final.js" />
+    <EmbeddedResource Include="src\screens\forgot.html" />
+    <EmbeddedResource Include="src\screens\forgot.js" />
+    <EmbeddedResource Include="src\screens\good-job.html" />
+    <EmbeddedResource Include="src\screens\good-job.js" />
+    <EmbeddedResource Include="src\screens\mood-after.js" />
+    <EmbeddedResource Include="src\screens\mood-answer-after.js" />
+    <EmbeddedResource Include="src\screens\mood-answer-before.js" />
+    <EmbeddedResource Include="src\screens\mood-answer.html" />
+    <EmbeddedResource Include="src\screens\mood-answer.js" />
+    <EmbeddedResource Include="src\screens\mood-before.js" />
+    <EmbeddedResource Include="src\screens\mood.html" />
+    <EmbeddedResource Include="src\screens\mood.js" />
+    <EmbeddedResource Include="src\screens\notice.html" />
+    <EmbeddedResource Include="src\screens\notice.js" />
+    <EmbeddedResource Include="src\screens\record-audio.html" />
+    <EmbeddedResource Include="src\screens\record-audio.js" />
+    <EmbeddedResource Include="src\screens\register-beactive.js" />
+    <EmbeddedResource Include="src\screens\register-connect.js" />
+    <EmbeddedResource Include="src\screens\register-give.js" />
+    <EmbeddedResource Include="src\screens\register-keeplearning.js" />
+    <EmbeddedResource Include="src\screens\register-takenotice.js" />
+    <EmbeddedResource Include="src\screens\register-wellbeing.html" />
+    <EmbeddedResource Include="src\screens\register-wellbeing.js" />
+    <EmbeddedResource Include="src\screens\register.html" />
+    <EmbeddedResource Include="src\screens\register.js" />
+    <EmbeddedResource Include="src\screens\review.html" />
+    <EmbeddedResource Include="src\screens\review.js" />
+    <EmbeddedResource Include="src\screens\select-action.js" />
+    <EmbeddedResource Include="src\screens\selection.html" />
+    <EmbeddedResource Include="src\screens\signin.html" />
+    <EmbeddedResource Include="src\screens\signin.js" />
+    <EmbeddedResource Include="src\screens\suggestion.html" />
+    <EmbeddedResource Include="src\screens\suggestion.js" />
+    <EmbeddedResource Include="src\screens\welcome.html" />
+    <EmbeddedResource Include="src\screens\welcome.js" />
+    <EmbeddedResource Include="src\screens\write-feelings.html" />
+    <EmbeddedResource Include="src\screens\write-feelings.js" />
+    <EmbeddedResource Include="src\script.js" />
+    <EmbeddedResource Include="src\sql\01-CreateDataBase.sql" />
+    <EmbeddedResource Include="src\sql\02-PopulateDataBase.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="7.0.2" />
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2196" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2578" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Xam.Plugins.AudioRecorder\Xam.Plugins.AudioRecorder.csproj" />
+    <ProjectReference Include="..\..\Xam.Plugins.DevicePermissions\Xam.Plugins.DevicePermissions.csproj" />
+    <ProjectReference Include="..\..\Xam.Plugins.Device\Xam.Plugins.Device.csproj" />
     <ProjectReference Include="..\..\Xam.Plugins.SQLite\Xam.Plugins.SQLite.csproj" />
+    <ProjectReference Include="..\..\Xam.Testing\Xam.Testing.csproj" />
+    <ProjectReference Include="..\..\Xam\Xam.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="JS\Resx.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resx.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="JS\Resx.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resx.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+    <Folder Include="src\html\" />
   </ItemGroup>
 </Project>

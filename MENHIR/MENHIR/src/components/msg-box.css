@@ -1,0 +1,23 @@
+msg-box {
+    display: block;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 100%;
+    max-width: calc(100% - 20px);
+    border-radius: 7px;
+    padding: 10px;
+    z-index: 100;
+}
+
+msg-box.hide {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear 300ms, opacity 200ms;
+}
+
+msg-box.show {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s linear 0s, opacity 200ms;
+}

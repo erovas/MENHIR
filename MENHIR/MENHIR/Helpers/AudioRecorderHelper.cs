@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MENHIR.Helpers
 {
-    internal class AudioRecorderHelper
+    public class AudioRecorderHelper
     {
     }
 }

@@ -1,0 +1,27 @@
+<style>
+    input {
+        display: none;
+    }
+    input:checked + label {
+        background-color: var(--color-logo);
+    }
+    label {
+        transition: background-color 0.3s;
+    }
+</style>
+<form class="prevent-select" style="height: 100%;">
+    <h1>What do you want to do?</h1>
+    
+    <input id="note" type="radio" value="1" name="Iwant">
+    <label for="note" class="btn-default">Write about your feelings</label>
+
+    <input id="record" type="radio" value="2" name="Iwant">
+    <label for="record" class="btn-default">Record your feelings</label>
+    
+    <input id="retrieve" type="radio" value="3" name="Iwant">
+    <label for="retrieve" class="btn-default" style="display: none;">Review</label>
+
+    <input id="exit" type="radio" value="4" name="Iwant">
+    <label for="exit" class="btn-default">Nothing</label>
+    
+</form>

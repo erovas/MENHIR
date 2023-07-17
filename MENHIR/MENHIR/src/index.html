@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>MENHIR</title>
+
+
+    <link href="components/loading-screen.css" rel="stylesheet"/>
+    <script src="components/loading-screen.js"></script>
+
+    <link href="components/exit-alert.css" rel="stylesheet"/>
+    <script src="components/exit-alert.js"></script>
+
+    <link href="components/arrow-button.css" rel="stylesheet"/>
+    <script src="components/arrow-button.js"></script>
+
+    <link href="components/msg-box.css" rel="stylesheet"/>
+    <script src="components/msg-box.js"></script>
+
+    <link href="components/simple-slider.css" rel="stylesheet"/>
+    <script src="components/simple-slider.js"></script>
+
+    <link href="components/player-sound.css" rel="stylesheet"/>
+    <script src="components/player-sound.js"></script>
+
+    <link href="css/styles.css" rel="stylesheet"/>
+    <link href="css/elementary.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+    <loading-screen></loading-screen>
+
+    <msg-box class="hide" id="msg-warning"></msg-box>
+    <msg-box class="hide" id="msg-info"></msg-box>
+    <msg-box class="hide" id="msg-error"></msg-box>
+
+
+    <div class="banner">
+        <img src="img/MENHIR-logo-simple.png">
+        <img src="img/AMHL.jpg">
+        <img src="img/UPV_EHU.jpg">
+        <img src="img/UGR.png">
+    </div>
+
+
+    <div class="gap"></div>
+
+    <simple-slider></simple-slider>
+
+    <exit-alert id="ExitAlert" class="hide"></exit-alert>
+    <exit-alert id="LogOutAlert" class="hide"></exit-alert>
+
+    <arrow-button class="hide" id="backbutton" data-direction = "left"></arrow-button>
+    <arrow-button class="hide" id="nextbutton" data-direction = "right"></arrow-button>
+
+</body>
+</html>
