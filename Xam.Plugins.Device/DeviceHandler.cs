@@ -114,6 +114,19 @@ namespace Xam.Plugins.Device
             return File.ReadAllText(filePath);
         }
 
+        public void WriteFileText(string filePath, string text)
+        {
+            try
+            {
+                File.WriteAllText(filePath, text);
+            }
+            catch (IOException ex)
+            {
+                throw new XamException(ex.Message, ex, "Plugin method");
+            }
+            
+        }
+
         public void Dispose()
         {
             BlockSleepMode(false);

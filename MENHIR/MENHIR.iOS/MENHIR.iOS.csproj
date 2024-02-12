@@ -69,6 +69,8 @@
     <Compile Include="AppDelegate.cs" />
     <Compile Include="Xam.Plugins.Device.Imp\SleepMode.cs" />
     <Compile Include="Xam.Plugins.Device.Imp\ToastMsg.cs" />
+    <Compile Include="Xam.Plugins.Notifications.Imp\iOSNotificationReceiver.cs" />
+    <Compile Include="Xam.Plugins.Notifications.Imp\iOSNotifications.cs" />
     <None Include="Entitlements.plist" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -136,9 +138,9 @@
       <Project>{7dff257d-3733-4f91-872f-2df320876950}</Project>
       <Name>Xam.Plugins.Device</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Xam.Testing\Xam.Testing.csproj">
-      <Project>{a0fbd110-60fb-457e-ab1b-30decad1c68b}</Project>
-      <Name>Xam.Testing</Name>
+    <ProjectReference Include="..\..\Xam.Plugins.Notifications\Xam.Plugins.Notifications.csproj">
+      <Project>{c50536d7-b6ed-4270-9958-5d69bd673c63}</Project>
+      <Name>Xam.Plugins.Notifications</Name>
     </ProjectReference>
     <ProjectReference Include="..\MENHIR\MENHIR.csproj">
       <Project>{DECF4094-DB5F-4316-AA90-BCB44AED7E7A}</Project>

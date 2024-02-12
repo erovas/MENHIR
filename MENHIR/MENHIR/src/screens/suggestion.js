@@ -34,7 +34,7 @@ async function Constructor(MH, root){
     }, 2000);
 
     setTimeout(() => {
-        //NextButton.onclick()
+        //NextButton.onclick();
     }, 5500);
 }
 
@@ -50,10 +50,13 @@ async function MakeSuggestion(MH, root){
     const HobbyName = Wellbeings[Story.IDAnswerAfter - 1];
     const HobbiesSelected = [];
 
+    const HobbyTableName = 'Hobbies' + HobbyName;
+    const HobbiesIDsSelected = [];
+
     /**
      * @type {Number[]} - HobbiesTakeNotice por ejemplo
      */
-    const Hobbies = User['Hobbies' + HobbyName];
+    const Hobbies = User[HobbyTableName];
 
     console.log(HobbyName);
 
@@ -78,6 +81,8 @@ async function MakeSuggestion(MH, root){
     // Se agrega el hobby a la lista para desplegar
     HobbiesSelected.push(HobbyEntities[IDHobby].Name);
 
+    HobbiesIDsSelected.push(HobbyEntities[IDHobby].ID);
+
     //Eliminamos del array de entidades todos los hobbies que el usuario tiene registrado en su perfil
     //Para quedarnos unicamente con aquello que NO tiene registrado en su perfil
     for (let i = 0; i < Hobbies.length; i++)
@@ -91,13 +96,15 @@ async function MakeSuggestion(MH, root){
 
         // Se agrega a la lista para desplegar
         HobbiesSelected.push(HobbyEntities[index].Name);
+
+        //HobbiesIDsSelected.push(index);
+        HobbiesIDsSelected.push(HobbyEntities[index].ID);
     }
     
     // Rellenar la lista
     PopulateList(MH, HobbiesSelected);
 
-    // TODO
-    // Xam.LanzarNotificacion en 2 dias
+    User.Story.Suggested = HobbyTableName + '-' + JSON.stringify(HobbiesIDsSelected);
 }
 
 /**

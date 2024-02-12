@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Xam;
+using Xam.Plugins.Notifications;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using static Xam.Plugins.SQLite.SQLite3;
@@ -22,8 +23,8 @@ namespace MENHIR.Controls
     {
         private Dictionary<string, object> Instances { get; }
         private Type TaskType { get; }
-
         private bool IsAndroid { get; }
+
 
         public HybridWebView() 
         {
@@ -83,7 +84,7 @@ namespace MENHIR.Controls
                 ID = entity.ID;
 
                 for (int i = 0; i < entity.Parameters.Length; i++)
-                    entity.Parameters[i] = entity.Parameters[i] == null? null : JsonElementToValue((JsonElement)entity.Parameters[i]);
+                    entity.Parameters[i] = entity.Parameters[i] == null? null : Misc.JsonElementToValue((JsonElement)entity.Parameters[i]);
 
                 //Se quiere crear una instancia de Classe nativa C#
                 if (entity.UID == "-CI-")
@@ -106,6 +107,9 @@ namespace MENHIR.Controls
 
                 else if (entity.UID == "-RF64-")
                     data = Convert.ToBase64String(File.ReadAllBytes(entity.Method));
+
+                else if(entity.UID == "-NTF-")
+                    SendNotification(entity);
 
                 else
                 {
@@ -170,6 +174,36 @@ namespace MENHIR.Controls
             await ExecuteJS(ID, error, data);
         }
 
+        private void SendNotification(Entity entity)
+        {
+            string title = entity.Method;
+            string message = entity.Parameters[0].ToString();
+            long? notifyTime = (long?)entity.Parameters[1];
+            List<object> rawArgs = new List<object>();
+
+            for (int i = 2; i < entity.Parameters.Length; i++)
+                rawArgs.Add(entity.Parameters[i]);
+            
+            string args = JsonSerializer.Serialize(rawArgs);
+
+            if(notifyTime is null)
+            {
+                MainPage.NotificationManager.SendNotification(title, message, null, args);
+                return;
+            }
+
+            //DateTime time = new DateTime((long)notifyTime);
+            //DateTime time = new DateTime((long)notifyTime);
+            var time = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                    .AddMilliseconds((long)notifyTime)
+                    .ToLocalTime();
+
+
+            MainPage.NotificationManager.SendNotification(title, message, time, args);
+
+            //notifications.SendNotification(entity.Parameters[0].ToString(), entity.Parameters[1].ToString(), DateTime.Now.AddSeconds(10));
+        }
+
         private string ExecuteConstructor(Entity entity)
         {
             string TypeName = entity.Method;
@@ -227,61 +261,6 @@ namespace MENHIR.Controls
                 MainThread.BeginInvokeOnMainThread(async () => await this.EvaluateJavaScriptAsync(js));
         }
 
-        private object JsonElementToValue(JsonElement item)
-        {
-            switch (item.ValueKind)
-            {
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    return null;
-
-                case JsonValueKind.Number:
-
-                    if (Math.Abs(item.GetDouble() % 1) <= (Double.Epsilon * 100))
-                    {
-                        if (item.TryGetInt32(out var value))
-                            return value;
-
-                        return item.GetInt64();
-                    }
-
-                    return item.GetDouble();
-
-                case JsonValueKind.True:
-                case JsonValueKind.False:
-                    return item.GetBoolean();
-
-                case JsonValueKind.Array:
-                    int length = item.GetArrayLength();
-                    var temp = new object[length];
-
-                    for (int i = 0; i < length; i++)
-                        temp[i] = JsonElementToValue(item[i]);
-
-                    return temp;
-
-                case JsonValueKind.Object:
-                    var temp3 = JsonSerializer.Deserialize<Dictionary<string, object>>(item.GetRawText());
-                    var temp4 = new Dictionary<string, object>();
-
-                    foreach (var item1 in temp3)
-                    {
-                        if(item1.Value is null)
-                        {
-                            temp4[item1.Key] = null;
-                            continue;
-                        }
-
-                        temp4[item1.Key] = JsonElementToValue((JsonElement)item1.Value);
-                    }
-                    
-                    return temp4;
-
-                default:
-                    return item.GetString();
-            }
-        }
-
         private string FormatResult(object data)
         {
             string result;
@@ -329,6 +308,7 @@ namespace MENHIR.Controls
 
             return result + Environment.NewLine;
         }
+    
     }
 
     internal class Entity

@@ -1,6 +1,11 @@
 'use strict';
 
-(async (window, document) => {
+/**
+ * 
+ * @param {Window} window 
+ * @param {Document} document 
+ */
+Xam.onload = async (window, document) => {
 
     //#region Objetos Nativos
 
@@ -9,7 +14,7 @@
      */
     const Xam = window.Xam;
     //await Xam.OpenDevTools();
-
+    
     /**
      * @type {import('./js/TypesDef.js').DeviceHandler}
      */
@@ -76,6 +81,18 @@
      */
     const MsgError = document.getElementById('msg-error');
 
+    /**
+     *  @type {import('./js/TypesDef.js').NotifyOne}
+     */
+    const NotifyOne = document.getElementById('NotifyOne');
+    NotifyOne.Text = 'Did you try any of our suggestions?';
+
+    /**
+     *  @type {import('./js/TypesDef.js').NotifyTwo}
+     */
+    const NotifyTwo = document.getElementById('NotifyTwo');
+    NotifyTwo.Text = 'Did you feel better?';
+
     const Components = {
         get SimpleSlider(){
             return SimpleSlider;
@@ -103,6 +120,12 @@
         },
         get MsgInfo(){
             return MsgInfo;
+        },
+        get NotifyOne(){
+            return NotifyOne;
+        },
+        get NotifyTwo(){
+            return NotifyTwo;
         }
     }
 
@@ -117,6 +140,12 @@
     //#region User
 
     const User = new (await import('./js/Classes.js')).User();
+
+    //#endregion
+
+    //#region 
+
+    const UserNotification = new (await import('./js/Classes.js')).UserNotification();
 
     //#endregion
 
@@ -157,6 +186,9 @@
     const MENHIR = {
         get User(){
             return User;
+        },
+        get UserNotification(){
+            return UserNotification;
         },
         get SQLite(){
             return SQLite;
@@ -248,7 +280,14 @@
 
         await Utils.DelayAsync(100);
         
-        const response = await import(route.load);
+        let response;
+
+        try {
+            response = await import(route.load);
+        } catch (error) {
+            throw error + "    qewerwwrwr";
+        }
+        
 
         for (const key in response) {
 
@@ -322,11 +361,13 @@
 
     //Evento de presionar boton Back de Android
     window.addEventListener("XamOnBackPressed", e => {
-        if(BackButton.onclick)
+        //if(BackButton.onclick)
+        //    BackButton.onclick();
+        if(BackButton.className !== "hide")
             BackButton.onclick();
     });
 
-    ExitAlert.Text = 'Do you want to exit the app?'
+    ExitAlert.Text = 'Do you want to leave the app?'
 
     ExitAlert.onclickYes = e => {
         //Xam.Close();
@@ -360,4 +401,89 @@
     LoadingScreen.Hide();
     //}, 0);
 
-})(window, document);
+    window.addEventListener('XamOnNotification', async e => {
+        const UserNotification = MENHIR.UserNotification;
+        const NotifyOne = Components.NotifyOne;
+        const NotifyTwo = Components.NotifyTwo;
+        const MsgError = MENHIR.Components.MsgError;
+
+        UserNotification.Clear();
+
+        let userNotEntity = JSON.parse(e.data.args[0]);
+
+        // Recuperar la entidad para saber si la notificación YA ha sido respondida
+        try {
+            userNotEntity = await MENHIR.Utils.GetUserNotificationEntity(userNotEntity.ID);    
+        } catch (error) {
+            MENHIR.Xam.ShowError(error);
+            return;
+        }
+        
+        console.log(userNotEntity);
+
+        // La notificación ya ha sido respondida
+        if(userNotEntity.DateResponse > 0)
+            return;
+
+        UserNotification.ID = userNotEntity.ID;
+        UserNotification.IDUser = userNotEntity.IDUser;
+        UserNotification.IDStory = userNotEntity.IDStory;
+        UserNotification.TableName = userNotEntity.TableName;
+        UserNotification.HobbiesIDs.clear();
+
+        for (let index = 0; index < userNotEntity.HobbiesIDs.length; index++) 
+            UserNotification.HobbiesIDs.push(userNotEntity.HobbiesIDs[index]);
+
+        UserNotification.Date = userNotEntity.Date;
+        UserNotification.DateResponse = userNotEntity.DateResponse;
+        UserNotification.IDHobbyResponse = userNotEntity.IDHobbyResponse;
+        UserNotification.FeelResponse = userNotEntity.FeelResponse;
+
+        NotifyTwo.onclickYes = async function(){
+            UserNotification.FeelResponse = 1;
+            NotifyTwo.Hide();
+            try {
+                console.log(UserNotification.toJSON())
+                await MENHIR.Utils.UpdateUserNotification(UserNotification);
+            } catch (error) {
+                MENHIR.Xam.ShowError(error);
+            }
+            
+        }
+
+        NotifyTwo.onclickNo = async function(){
+            UserNotification.FeelResponse = 0;
+            NotifyTwo.Hide();
+            try {
+                await MENHIR.Utils.UpdateUserNotification(UserNotification);
+            } catch (error) {
+                MENHIR.Xam.ShowError(error);
+            }
+            
+        }
+
+        NotifyOne.onClicked = async function(){
+            UserNotification.IDHobbyResponse = NotifyOne.Selected;
+            await NotifyOne.Hide();
+            await NotifyTwo.Show();
+        }
+
+        try {
+            const TextosValores = await MENHIR.Utils.GetTextosValoresSugerencias(MENHIR.UserNotification);
+
+            for (let index = 0; index < TextosValores.length; index++) {
+                const obj = TextosValores[index];
+                TextosValores[index] = { texto: 'Yes, ' + obj.texto, valor: obj.valor };
+            }
+
+            TextosValores.push({texto: 'No', valor: 0});
+    
+            console.log(TextosValores);
+            NotifyOne.Show(TextosValores);    
+        } catch (error) {
+            MENHIR.Xam.ShowError(error);
+        }
+        
+    });
+
+}//)(window, document);

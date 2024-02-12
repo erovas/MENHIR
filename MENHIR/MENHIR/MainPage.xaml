@@ -11,14 +11,14 @@
 
     <ContentPage.Content>
 
-        <StackLayout BackgroundColor="Red" x:Name="BgStack">
+        <!--<StackLayout BackgroundColor="Red" x:Name="BgStack">-->
 
             <controls:HybridWebView
                 x:Name="webViewElement"
                 HorizontalOptions="FillAndExpand"
                 VerticalOptions="FillAndExpand" />
             
-        </StackLayout>
+        <!--</StackLayout>-->
     </ContentPage.Content>
 
 </ContentPage>

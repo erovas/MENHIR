@@ -397,7 +397,8 @@ class Story {
     constructor(name){
         const value = {
             ID: 0,
-            IDUser: 0,
+            /* IDUser: 0, */
+            IDUser: '',
             IDStoryType: 0,
             IDMoodBefore: null,
             IDAnswerBefore: null,
@@ -406,7 +407,8 @@ class Story {
             Date: 0,
             Title: null,
             Text: null,
-            Source: null
+            Source: null,
+            Suggested: null,
         }
 
         this.#value = new SessionObject(name, value);
@@ -424,7 +426,8 @@ class Story {
     }
 
     set IDUser(value){
-        this.#value.IDUser  = ParseInt(value);
+        //this.#value.IDUser  = ParseInt(value);
+        this.#value.IDUser  = value + '';
     }
 
     get IDStoryType(){
@@ -492,6 +495,14 @@ class Story {
         this.#value.Source = ToStringNull(value);
     }
 
+    get Suggested(){
+        return this.#value.Suggested;
+    }
+
+    set Suggested(value){
+        this.#value.Suggested = ToStringNull(value);
+    }
+
     Dispose(){
         this.#value.Dispose();
         this.#value = undefined;
@@ -499,7 +510,8 @@ class Story {
 
     Clear(){
         this.ID = 0;
-        this.IDUser = 0;
+        //this.IDUser = 0;
+        this.IDUser = '';
         this.IDStoryType = 0;
         this.IDMoodBefore = null;
         this.IDAnswerBefore = null;
@@ -509,7 +521,7 @@ class Story {
         this.Title = null;
         this.Text = null;
         this.Source = null;
-        
+        this.Suggested = null;
     }
 
     toJSON(){
@@ -542,7 +554,8 @@ class User {
 
     constructor(){
         const value = {
-            ID: 0,
+            //ID: 0,
+            ID: '',
             IDGender: 0,
             Date: 0,
             Username: '',
@@ -561,7 +574,8 @@ class User {
         return this.#value.ID;
     }
     set ID(value){
-        this.#value.ID = ParseInt(value);
+        //this.#value.ID = ParseInt(value);
+        this.#value.ID = value + '';
         this.#Story.IDUser = this.#value.ID;
     }
 
@@ -662,7 +676,8 @@ class User {
     }
 
     Clear(){
-        this.ID = 0;
+        //this.ID = 0;
+        this.ID = '';
         this.IDGender = 0;
         this.Date = 0;
         this.Username = '';
@@ -692,4 +707,117 @@ class User {
     }
 }
 
-export { User, Story, SessionObject, SessionArray }
+class UserNotification {
+
+    #value;
+
+    #HobbiesIDs = new SessionArray('MH-HobbiesIDs');
+
+    constructor(){
+        const value = {
+            ID: 0,
+            IDUser: '',
+            IDStory: 0,
+            TableName: '',
+            
+            Date: 0,
+            DateResponse: 0,
+            IDHobbyResponse: 0,
+            FeelResponse: 0,
+        }
+
+        this.#value = new SessionObject('MH-UserNotification', value);
+    }
+
+    get ID(){
+        return this.#value.ID;
+    }
+    set ID(value){
+        this.#value.ID = ParseInt(value);
+    }
+
+    get IDUser(){
+        return this.#value.IDUser;
+    }
+    set IDUser(value){
+        this.#value.IDUser = value + '';
+    }
+
+    get IDStory(){
+        return this.#value.IDStory;
+    }
+    set IDStory(value){
+        this.#value.IDStory = ParseInt(value);
+    }
+
+    get TableName(){
+        return this.#value.TableName;
+    }
+    set TableName(value){
+        if(typeof value == 'string')
+            this.#value.TableName = value;
+    }
+
+    get HobbiesIDs(){
+        return this.#HobbiesIDs;
+    }
+
+    get Date(){
+        return this.#value.Date;
+    }
+    set Date(value){
+        this.#value.Date = ParseInt(value);
+    }
+
+    get DateResponse(){
+        return this.#value.DateResponse;
+    }
+    set DateResponse(value){
+        this.#value.DateResponse = ParseInt(value);
+    }
+
+    get IDHobbyResponse(){
+        return this.#value.IDHobbyResponse;
+    }
+    set IDHobbyResponse(value){
+        this.#value.IDHobbyResponse = ParseInt(value);
+    }
+
+    get FeelResponse(){
+        return this.#value.FeelResponse;
+    }
+
+    set FeelResponse(value){
+        this.#value.FeelResponse = ParseInt(value);
+    }
+
+    Clear() {
+        this.ID = 0;
+        this.IDUser = '';
+        this.IDStory = 0;
+        this.TableName = '';
+        this.Date = 0;
+        this.DateResponse = 0;
+        this.IDHobbyResponse = 0;
+        this.FeelResponse = 0;
+        this.HobbiesIDs.clear();
+    }
+
+    Dispose(){
+        this.#value.Dispose()
+        this.#value = undefined;
+        
+        this.HobbiesIDs.Dispose();
+        this.#HobbiesIDs = undefined;
+    }
+
+    toJSON(){
+        const result = this.#value.getObject();
+        result.HobbiesIDs = this.HobbiesIDs.getArray();
+
+        return result;
+    }
+
+}
+
+export { User, Story, SessionObject, SessionArray, UserNotification }

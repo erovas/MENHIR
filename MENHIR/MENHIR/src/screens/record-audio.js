@@ -47,7 +47,7 @@ async function Constructor(MH, root){
     // Es dificil predecir el estado de los objetos nativos, lo mejor obligar a grabar de nuevo
     Story.Source = null;
 
-    await TryDeleteAudio(MH);
+    //await TryDeleteAudio(MH);
 
     const granted = await CheckPermission(MH, root);
 
@@ -72,7 +72,7 @@ async function Constructor(MH, root){
         }
         
         //Se está tratando de grabar de nuevo, borrar el audio anterior si lo hay
-        await TryDeleteAudio(MH);
+        //await TryDeleteAudio(MH);
 
         // Va a grabar
         Story.Source = null;

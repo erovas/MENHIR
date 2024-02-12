@@ -113,6 +113,7 @@ function ConfigViewers(){
     AudioView._closer = Controls.ViewAudio.querySelector('div[class="closer"]');
 
     AudioView._closer.onclick = e => {
+        Controls.PlayerSound.Stop();
         Controls.ViewAudio.className = 'hide';
         AudioView._h2.innerText = '';
     }
@@ -146,7 +147,7 @@ async function Constructor(MH, root){
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     //const stories = await GetStoriesByDate(MH, sevenDaysAgo, Date.now())
-    const stories = await GetStoriesByDate(MH, 0, Date.now())
+    const stories = await GetStoriesByDate(MH, 0, Date.now(), MH.User.ID);
     await SetDOMList(MH, stories);
 
     ConfigViewers();
@@ -169,9 +170,10 @@ async function Constructor(MH, root){
  * @param {import('../js/TypesDef.js').MENHIR} MH 
  * @param {Date} dateFrom 
  * @param {Date} dateTo 
+ * @param {String} IDUser 
  * @returns {@returns {import('../js/TypesDef.js').StoryEntity[]}}
  */
-async function GetStoriesByDate(MH, dateFrom, dateTo){
+async function GetStoriesByDate(MH, dateFrom, dateTo, IDUser){
     const sql =
     `
         SELECT
@@ -188,6 +190,7 @@ async function GetStoriesByDate(MH, dateFrom, dateTo){
             Source
         FROM UserStories
         WHERE Date BETWEEN @dateFrom AND @dateTo
+        AND IDUser = @IDUser
         ORDER BY ID DESC
     `;
 
@@ -197,7 +200,11 @@ async function GetStoriesByDate(MH, dateFrom, dateTo){
     if(dateTo instanceof Date)
         dateTo = dateTo.getDate();
 
-    const parameters = { dateFrom, dateTo };
+    const parameters = { 
+        dateFrom, 
+        dateTo,
+        IDUser
+    };
 
     await MH.SQLite.Open();
     const response = await MH.SQLite.ExecuteData(sql, parameters);

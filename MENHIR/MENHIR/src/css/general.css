@@ -33,6 +33,7 @@ html {
     height: 100%;
     font-size: 16px;
     overflow: hidden;
+    background-color: beige;
 }
 
 body {
@@ -40,6 +41,7 @@ body {
     flex-direction: column;
     margin: 0;
     height: 100%;
+    min-height: 100%;
 
     & > main {
         margin-top: 50px;
@@ -50,6 +52,7 @@ body {
         padding-left: 10px;
         padding-right: 10px;
         transition: opacity 0.5s;
+        height: 100%;
     }
 }
 

@@ -11,6 +11,7 @@
 
     const WVI = '--UID--';
     const CD = '-CD-';
+    const CED = '-CED-';
     const Stringify = JSON.stringify;
     const CLASSES = Object.create(null);
     let devToolsInitiated = false;
@@ -181,6 +182,36 @@
         return await WV.Send('-RTF-', newUrl);
     }
 
+    const ReadTextFile2 = url => {
+        console.log(url);
+        return new Promise((resolve, reject) => {
+
+            if (window.location.protocol.includes('file:')) {
+                url = url.replaceAll('../', '');
+                let index = url.indexOf('./');
+
+                if (index < 0)
+                    url = './' + url;
+            }
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            const errorTest = new Error('prueba');
+
+            xhr.onloadend = e => {
+                let xhrStatus = xhr.status;
+                //respuesta satisfactoria (200 a 299) ó cache (304)
+                if ((xhrStatus >= 200 && xhrStatus < 300) || xhrStatus == 304)
+                    resolve(xhr.responseText);
+                else
+                    reject({ url, xhrStatus, statusText: xhr.statusText, errorTest });
+            }
+            xhr.onerror = e => reject({ e, url, xhrStatus: xhr.status, statusText: xhr.statusText, errorTest });
+            
+            xhr.send();
+        });
+    }
+
     const ReadFileBase64 = async (url) => {
         return await WV.Send('-RF64-', url);
     }
@@ -204,6 +235,27 @@
         devToolsInitiated = true;
     }
 
+    /**
+     * 
+     * @param {String} title - Titulo de la notificación
+     * @param {String} message - Mensaje de la notificación
+     * @param {Date | null} notifyTime - Tiempo de espera para lanzar notificación
+     * @param  {...any} [args] 
+     */
+    const SendNotification = async (title, message, notifyTime, ...args) => {
+
+        if (notifyTime instanceof Date)
+            notifyTime = notifyTime.getTime();
+        else
+            notifyTime = null;
+
+        args.unshift(notifyTime);
+        args.unshift(message);
+        await WV.Send('-NTF-', title, args);
+    }
+
+    let OnLoadXam = null;
+
     //Para exponer API en JS
     const XAM = {
         get new() {
@@ -225,10 +277,13 @@
             return OpenDevTools;
         },
         get ReadTextFile() {
-            return ReadTextFile;
+            return ReadTextFile2;
         },
         get ReadFileBase64() {
             return ReadFileBase64;
+        },
+        get SendNotification() {
+            return SendNotification;
         },
         get LoadScript() {
             return LoadScript;
@@ -238,6 +293,18 @@
         },
         get CurrentDirectory() {
             return CD;
+        },
+        get CurrentExternalDirectory() {
+            return CED;
+        },
+        get onload() {
+            return OnLoadXam;
+        },
+        set onload(value) {
+            if (typeof value != 'function')
+                value = null;
+
+            OnLoadXam = value;
         }
     };
 
@@ -289,6 +356,29 @@
         if (document.body) {
             checkBodyReady = null;
             await LoadScript('index.js');
+            
+            if (!OnLoadXam)
+                return ShowError('Xam.onload is not a function');
+
+            try {
+                await OnLoadXam(window, document);
+            } catch (e) {
+                ShowError(e);
+                return;
+            }
+            
+            const NotificationData = sessionStorage.getItem(WVI);
+
+            if (NotificationData == null)
+                return;
+
+            // Se elimina los datos, porque se va a lanzar el evento
+            sessionStorage.removeItem(WVI);
+
+            // Hay datos, por tanto se lanza el evento
+            const data = JSON.parse(NotificationData);
+            WV.FireEvent('OnNotification', false, data);
+
             return;
         }
 

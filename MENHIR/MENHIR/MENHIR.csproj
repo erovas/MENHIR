@@ -16,6 +16,7 @@
     <None Remove="src\components\exit-alert.js" />
     <None Remove="src\components\loading-screen.js" />
     <None Remove="src\components\msg-box.js" />
+    <None Remove="src\components\notify-one.js" />
     <None Remove="src\components\player-sound.js" />
     <None Remove="src\components\simple-slider.js" />
     <None Remove="src\html\SC_00.html" />
@@ -140,6 +141,7 @@
     <EmbeddedResource Include="src\components\exit-alert.js" />
     <EmbeddedResource Include="src\components\loading-screen.js" />
     <EmbeddedResource Include="src\components\msg-box.js" />
+    <EmbeddedResource Include="src\components\notify-one.js" />
     <EmbeddedResource Include="src\components\player-sound.js" />
     <EmbeddedResource Include="src\components\simple-slider.js" />
     <EmbeddedResource Include="src\img\AMHL.jpg" />
@@ -217,8 +219,8 @@
     <ProjectReference Include="..\..\Xam.Plugins.AudioRecorder\Xam.Plugins.AudioRecorder.csproj" />
     <ProjectReference Include="..\..\Xam.Plugins.DevicePermissions\Xam.Plugins.DevicePermissions.csproj" />
     <ProjectReference Include="..\..\Xam.Plugins.Device\Xam.Plugins.Device.csproj" />
+    <ProjectReference Include="..\..\Xam.Plugins.Notifications\Xam.Plugins.Notifications.csproj" />
     <ProjectReference Include="..\..\Xam.Plugins.SQLite\Xam.Plugins.SQLite.csproj" />
-    <ProjectReference Include="..\..\Xam.Testing\Xam.Testing.csproj" />
     <ProjectReference Include="..\..\Xam\Xam.csproj" />
   </ItemGroup>
 

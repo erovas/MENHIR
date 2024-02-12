@@ -74,12 +74,14 @@ namespace MENHIR.Droid.Controls
             this.Control.Settings.MediaPlaybackRequiresUserGesture = false;
 
             string Script = MainPage.Script.Replace("/*Bridge*/", "jsBridge.invokeAction(data);");
-            Control.SetWebViewClient(new JavascriptWebViewClient(Script));
+            //Control.SetWebViewClient(new JavascriptWebViewClient(Script));
+            Control.SetWebViewClient(new JavascriptWebViewClient(Script, this));
             Control.AddJavascriptInterface(new JsBridge(this), "jsBridge");
 
             var xfWebView = (HybridWebView)this.Element;
             var source = (HtmlWebViewSource)xfWebView.Source;
             this.Control.LoadUrl(source.BaseUrl);
         }
+
     }
 }

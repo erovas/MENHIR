@@ -15,6 +15,15 @@
  */
 
 /**
+ * @callback SendNotification 
+ * @param {String} title - Titulo de la notificación
+ * @param {String} message - Mensaje de la notificación
+ * @param {Date | null} notifyTime - Tiempo de espera para lanzar notificación
+ * @param  {...any} [args] - Datos extras a pasar
+ * @returns {Promise<void>}
+ */
+
+/**
  * @typedef {object} Xam
  * @property {New} new - Llama al constructor de una clase nativa para crear una instancia.
  * @property {()=> Promise<String>} CleanUp - Limpia todas las instancias de los objetos nativos
@@ -24,9 +33,12 @@
  * @property {(url: URL) => Promise<void>} OpenDevTools - Abre las herramientas de desarrollador
  * @property {(url: URL) => Promise<String>} ReadTextFile - Lee el texto de un archivo
  * @property {(url: URL) => Promise<String>} ReadFileBase64 - Lee un archivo como string base 64
+ * @property {SendNotification} SendNotification - Para lanzar notificaciones nativas
  * @property {(url: URL) => Promise<void>} LoadScript - Carga un script
  * @property {(error: any) => Promise<void>} ShowError - Muestra en pantalla un mensaje de error.
  * @property {Readonly<string>} CurrentDirectory - Obtiene la ruta del directorio en donde se está ejecutando la aplicacion web
+ * @property {Readonly<string>} CurrentExternalDirectory - Obtiene la ruta del directorio externo en donde se está ejecutando la aplicacion 
+ * @property {Function | null} onload - Evento load de la aplicación
  */
 
 //#endregion
@@ -118,6 +130,7 @@
  * @property {(filePath: string) => Promise<boolean>} FileExists - Indica si el archivo especificado en la ruta existe
  * @property {(filePath: string) => Promise<void>} DeleteFile - Elimina el archivo especificado en la ruta
  * @property {(filePath: string) => Promise<String>} ReadFileText - Lee el contenido de un archivo como texto
+ * @property {(filePath: string, text: string) => Promise<void>} WriteFileText - Escribe un archivo de texto
  */
 
 /**
@@ -180,6 +193,7 @@
  * @property {String | null} Title - UserStories.Title => Titulo de la historia
  * @property {String | null} Text - UserStories.Text => para IDStoryType === 1
  * @property {String | Number | null} Source - UserStories.Source => para IDStoryType !== 1
+ * @property {String | Number | null} Suggested - UserStories.Suggested => para cualquier IDStoryType, cuando el moodAfter es negativo
  */
 
 /**
@@ -194,8 +208,19 @@
  */
 
 /**
- * @typedef {object} UserEntity
+ * @typedef {object} UserEntity_old
  * @property {Number} ID - Users.ID
+ * @property {Number} IDGender - Users.IDGender
+ * @property {Number} Date - Users.Date
+ * @property {String} Username - Users.Username
+ * @property {Number} Age - Users.Age
+ * @property {String} Password - Users.Password
+ * @property {String} Phrase - Users.Phrase
+ */
+
+/**
+ * @typedef {object} UserEntity
+ * @property {String} ID - Users.ID
  * @property {Number} IDGender - Users.IDGender
  * @property {Number} Date - Users.Date
  * @property {String} Username - Users.Username
@@ -320,6 +345,11 @@
  * @property {(story: Story) => Promise<void>} InsertStory - Inserta una story en base de datos
  * @property {(user: User) => Promise<void>} PopulatetUser - Establece los valores del objeto User aportado como parametro
  * @property {(hobbyName: String) => Promise<{ID: Number, Name: String}[]>} GetAllHobbies - Obtiene todos los campos de la tabla de hobbies
+ * @property {() => String} NewGUID - Crea un GUID (Global Unique Identifier)
+ * @property {(userNotification: UserNotification) => Promise<void>} InsertUserNotification - Inserta una notificación de usuario
+ * @property {(userNotification: UserNotification) => Promise<void>} UpdateUserNotification - Actualiza una notificación de usuario
+ * @property {(userNotification: UserNotification) => Promise<void>} GetTextosValoresSugerencias - Obtiene los textos de los hobbies de sugerencia
+ * @property {(ID: Number) => Promise<{}>} GetUserNotificationEntity - Crea un GUID (Global Unique Identifier)
  */
 
 /**
@@ -337,11 +367,25 @@
  * @property {Number} Nothing - Review previous thoughts
  */
 
+/**
+ * @typedef {object} UserNotification
+ * @property {Number} ID - UserNotification.ID
+ * @property {String} IDUser - UserNotification.IDUser
+ * @property {Number} IDStory - UserNotification.IDStory
+ * @property {String} TableName - Nombre de la tabla de moods
+ * @property {Number[]} HobbiesIDs - IDs de los hobbies sugeridos
+ * @property {Number} Date - Fecha de creación
+ * @property {Number} DateResponse - Fecha de respuesta de la notificación
+ * @property {Number} IDHobbyResponse - ID del hobby seleccionado (cero si ha dicho que no)
+ * @property {Number} FeelResponse - ¿Te sientes mejor? 1: Si, 0: No
+ */
+
 //#region Definición MENHIR
 
 /**
  * @typedef {object} MENHIR 
  * @property {Readonly<User>} User - Objeto Entidad del usuario logueado/creado
+ * @property {Readonly<UserNotification>} UserNotification - Objeto Entidad del usuario logueado/creado
  * @property {Readonly<SQLiteConnectionAsync>} SQLite - Objeto Nativo para acceso base de datos
  * @property {Readonly<DeviceHandler>} DeviceHandler - Objeto Nativo para acceso algunas caracteristicas del móvil
  * @property {Readonly<DevicePermissions>} DevicePermissions - Objeto Nativo para controlar los permisos
@@ -373,3 +417,11 @@
 
 //exports.unused = {};
 export const some = {};
+
+/*
+    const time = new Date();
+    time.setSeconds(time.getSeconds() + 20);
+    //MH.Xam.SendNotification('titulo', 'texto', null, "valor", 1 ,2 ,3, "hola");   1689723271674
+    console.log(time.getTime());
+    await MH.Xam.SendNotification('titulo', 'texto', time, "valor", 1 ,2 ,3, "hola");
+*/

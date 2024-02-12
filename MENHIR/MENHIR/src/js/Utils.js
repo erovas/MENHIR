@@ -1,3 +1,5 @@
+import { UserNotification } from './Classes.js';
+
 const HOBBIES_NAME = ['HobbiesConnect', 'HobbiesBeActive', 'HobbiesKeepLearning', 'HobbiesGive', 'HobbiesTakeNotice'];
 
 /**
@@ -146,6 +148,16 @@ function ClonePlainObject(target, source){
 }
 
 /**
+ * Crea un GUID (Global Unique Identifier)
+ * @returns 
+ */
+function NewGUID(){
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
+/**
  * 
  * @param {import('./TypesDef.js').User} user 
  */
@@ -160,6 +172,7 @@ async function InsertUser(user) {
     `
         INSERT INTO Users
             (
+                ID,
                 IDGender,
                 Date,
                 Username,
@@ -169,6 +182,7 @@ async function InsertUser(user) {
             )
         VALUES
             (
+                @ID,
                 @IDGender,
                 @Date,
                 @Username,
@@ -179,6 +193,7 @@ async function InsertUser(user) {
     `;
 
     let parameters = {
+        ID: NewGUID(),
         IDGender: user.IDGender,
         Date:     user.Date,
         Username: user.Username,
@@ -295,7 +310,8 @@ async function InsertStory(story) {
                 Date,
                 Title,
                 Text,
-                Source
+                Source,
+                Suggested
             )
         VALUES
             (
@@ -308,7 +324,8 @@ async function InsertStory(story) {
                 @Date,
                 @Title,
                 @Text,
-                @Source
+                @Source,
+                @Suggested
             )
     `;
 
@@ -332,15 +349,19 @@ async function InsertStory(story) {
     `
         SELECT ID
         FROM UserStories
-        WHERE IDUser = ${parameters.IDUser}
-        AND Date = ${parameters.Date}
+        WHERE IDUser = @IDUser
+        AND Date = @Date
     `;
 
     let ID;
+    const paramss = {
+        IDUser: parameters.IDUser,
+        Date: parameters.Date
+    }
 
     try {
         await SQLite.Open();
-        ID = await SQLite.ExecuteEscalar(sql);
+        ID = await SQLite.ExecuteEscalar(sql, paramss);
         await SQLite.Close();    
     } catch (error) {
         try {
@@ -451,6 +472,195 @@ async function GetAllHobbies(hobbyName) {
     return data;
 }
 
+/**
+ * 
+ * @param {import('./TypesDef.js').UserNotification} userNotification 
+ */
+async function InsertUserNotification(userNotification){
+    let sql = 
+    `
+        INSERT INTO UserNotification
+            (
+                IDUser,
+                IDStory,
+                TableName,
+                HobbiesIDs,
+                Date,
+                DateResponse,
+                IDHobbyResponse,
+                FeelResponse
+            )
+        VALUES
+            (
+                @IDUser,
+                @IDStory,
+                @TableName,
+                @HobbiesIDs,
+                @Date,
+                @DateResponse,
+                @IDHobbyResponse,
+                @FeelResponse
+            )
+    `;
+
+    userNotification.Date = Date.now();
+
+    let parameters = userNotification.toJSON();
+
+    delete parameters.ID;
+    parameters.HobbiesIDs = JSON.stringify(parameters.HobbiesIDs)
+
+    try {
+        await SQLite.Open();
+        await SQLite.ExecuteNonQuery(sql, parameters);    
+        await SQLite.Close();
+    } catch (error) {
+        
+        try {
+            await SQLite.Close();
+        } catch (error) { }
+        throw error;
+    }
+
+    //Se ha insertado, recuperar el ID del UserNotification
+    sql = 
+    `
+        SELECT ID
+        FROM UserNotification
+        WHERE IDUser = @IDUser
+        AND IDStory = @IDStory
+    `;
+
+    parameters = {
+        IDUser: userNotification.IDUser,
+        IDStory: userNotification.IDStory
+    }
+
+    let ID;
+
+    try {
+        await SQLite.Open();
+        ID = await SQLite.ExecuteEscalar(sql, parameters);
+        await SQLite.Close();    
+    } catch (error) {
+        try {
+            await SQLite.Close();
+        } catch (error) { }
+        throw error;
+    }
+    
+    userNotification.ID = ID;
+}
+
+/**
+ * 
+ * @param {import('./TypesDef.js').UserNotification} userNotification 
+ */
+async function UpdateUserNotification(userNotification){
+    let sql = 
+    `
+        UPDATE UserNotification SET
+            DateResponse = @DateResponse,
+            IDHobbyResponse = @IDHobbyResponse,
+            FeelResponse = @FeelResponse
+        WHERE ID = @ID
+    `;
+
+    userNotification.DateResponse = Date.now();
+
+    let parameters = {
+        DateResponse: userNotification.DateResponse,
+        IDHobbyResponse: userNotification.IDHobbyResponse,
+        FeelResponse: userNotification.FeelResponse,
+        ID: userNotification.ID
+    }
+
+    try {
+        await SQLite.Open();
+        await SQLite.ExecuteNonQuery(sql, parameters);    
+        await SQLite.Close();
+    } catch (error) {
+        
+        try {
+            await SQLite.Close();
+        } catch (error) { }
+        throw error;
+    }
+}
+
+/**
+ * @param {import('./TypesDef.js').UserNotification} userNotification 
+ */
+async function GetTextosValoresSugerencias(userNotification){
+    let sql = 
+    `
+        SELECT Name
+        FROM TableName
+        WHERE ID = @ID
+    `;
+
+    sql = sql.replace('TableName', userNotification.TableName);
+
+    let parameters = {
+        ID: 0
+    }
+
+    const salida = [];
+
+    try {
+        await SQLite.Open();
+
+        for (let index = 0; index < userNotification.HobbiesIDs.length; index++) {
+            parameters.ID = userNotification.HobbiesIDs[index]
+            const texto = await SQLite.ExecuteEscalar(sql, parameters)
+            salida.push({ texto: texto, valor: parameters.ID });
+        }
+
+        await SQLite.Close();    
+    } catch (error) {
+        try {
+            await SQLite.Close();
+        } catch (error) { }
+        throw error;
+    }
+    
+    return salida;
+}
+
+/**
+ * 
+ * @param {Number} ID 
+ * @returns
+ */
+async function GetUserNotificationEntity(ID){
+    let sql = 
+    `
+    SELECT *
+    FROM UserNotification
+    WHERE ID = @ID
+    `;
+
+    let parameters = {
+        ID: ID
+    }
+
+    let resultado = {};
+
+    try {
+        await SQLite.Open();
+        resultado = (await SQLite.ExecuteData(sql, parameters))[0];
+        await SQLite.Close();    
+    } catch (error) {
+        try {
+            await SQLite.Close();
+        } catch (error) { }
+        throw error;
+    }
+
+    resultado.HobbiesIDs = JSON.parse(resultado.HobbiesIDs);
+    
+    return resultado;
+}
 
 /**
  * Funciones utiles
@@ -511,6 +721,26 @@ export default function(SQLiteConnection){
 
         get GetAllHobbies(){
             return GetAllHobbies;
+        },
+
+        get NewGUID(){
+            return NewGUID;
+        },
+
+        get InsertUserNotification(){
+            return InsertUserNotification;
+        },
+
+        get UpdateUserNotification(){
+            return UpdateUserNotification;
+        },
+
+        get GetTextosValoresSugerencias(){
+            return GetTextosValoresSugerencias;
+        },
+
+        get GetUserNotificationEntity(){
+            return GetUserNotificationEntity;
         }
     }
 }

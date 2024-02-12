@@ -35,6 +35,7 @@ async function Constructor(MH, root){
     //Controls.BtnDoSome.onclick = e => {
     //    MH.GoTo(MH.Routes.Crisis);
     //}
+    Controls.BtnDoSome.style.height = "var(--banner-height)"
 
     BackButton.onclick = e => {
         switch (Story.IDStoryType) {

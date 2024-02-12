@@ -11,6 +11,7 @@
 
     const WVI = '--UID--';
     const CD = '-CD-';
+    const CED = '-CED-';
     const Stringify = JSON.stringify;
     const CLASSES = Object.create(null);
     let devToolsInitiated = false;
@@ -182,6 +183,38 @@
         return await WV.Send('-RTF-', newUrl);
     }
 
+    const ReadTextFile2 = url => {
+        console.log(url);
+        return new Promise((resolve, reject) => {
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.onload = e => {
+                console.log(xhr);
+                console.log(xhr.responseText);
+            }
+            xhr.onloadend = e => {
+                let xhrStatus = xhr.status;
+                console.log("end");
+                console.log(xhr.status);
+                console.log(xhr);
+                console.log(xhr.responseText);
+                resolve(xhr.responseText);
+                //respuesta satisfactoria (200 a 299) ó cache (304)
+                if ((xhrStatus >= 200 && xhrStatus < 300) || xhrStatus == 304)
+                    resolve(xhr.responseText);
+                else
+                    reject({ url, xhrStatus, statusText: xhr.statusText });
+            }
+            xhr.onerror = e => {
+                console.log(e);
+                console.log(xhr);
+                reject(e);
+            };
+            
+            xhr.send();
+        });
+    }
+
     const ReadFileBase64 = async (url) => {
         return await WV.Send('-RF64-', url);
     }
@@ -203,6 +236,25 @@
             window.eruda.init();
 
         devToolsInitiated = true;
+    }
+
+    /**
+     * 
+     * @param {String} title - Titulo de la notificación
+     * @param {String} message - Mensaje de la notificación
+     * @param {Date | null} notifyTime - Tiempo de espera para lanzar notificación
+     * @param  {...any} [args] 
+     */
+    const SendNotification = async(title, message, notifyTime, ...args) => {
+        
+        if(notifyTime instanceof Date)
+            notifyTime = notifyTime.getTime();
+        else
+            notifyTime = null;
+
+        args.unshift(notifyTime);
+        args.unshift(message);
+        await WV.Send('-NTF-', title, args);
     }
 
     //Para exponer API en JS
@@ -231,6 +283,9 @@
         get ReadFileBase64(){
             return ReadFileBase64;
         },
+        get SendNotification(){
+            return SendNotification;
+        },
         get LoadScript(){
             return LoadScript;
         },
@@ -239,7 +294,10 @@
         },
         get CurrentDirectory() {
             return CD;
-        }
+        },
+        get CurrentExternalDirectory() {
+            return CED;
+        },
     };
 
     // Exposición de la API al desarrollador, como window.Xam
@@ -290,6 +348,19 @@
         if (document.body) {
             checkBodyReady = null;
             await LoadScript('index.js');
+
+            const NotificationData = sessionStorage.getItem(WVI);
+
+            // No hay datos para lanzar "XamOnNotification"
+            if(NotificationData == null)
+                return;
+
+            sessionStorage.removeItem(WVI);
+
+            // Hay datos, por tanto se lanza el evento
+            const data = JSON.parse(NotificationData);
+            WV.FireEvent('OnNotification', false, data);
+
             return;
         }
 
